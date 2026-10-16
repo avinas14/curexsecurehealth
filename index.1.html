@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#174a35"><meta name="description" content="Curex Secure Health — patient-controlled health record sharing.">
+  <title>Curex Secure Health</title><link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div id="custom-cursor" aria-hidden="true"><span></span></div>
+<div id="toast-region" class="toast-region" aria-live="polite"></div>
+<section id="auth-screen" class="auth-screen">
+  <div class="auth-card">
+    <div class="auth-brand"><span class="brand-mark"><svg viewBox="0 0 40 40"><path d="M16 6h8v10h10v8H24v10h-8V24H6v-8h10z" fill="currentColor"/></svg></span><span><b>Curex</b><small>SECURE HEALTH</small></span></div>
+    <div class="auth-eyebrow">YOUR HEALTH, YOUR CHOICE</div>
+    <h1 id="auth-title">Welcome back</h1>
+    <p class="auth-subtitle" id="auth-subtitle">Sign in to securely manage your health records.</p>
+    <form id="login-form" class="auth-form">
+      <label for="auth-email">Email address</label><input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email" required>
+      <label for="auth-password">Password</label><input id="auth-password" type="password" placeholder="Enter your password" autocomplete="current-password" minlength="4" required>
+      <label for="auth-role">Open demo as</label><select id="auth-role"><option value="patient">Patient</option><option value="doctor">Doctor</option><option value="admin">Administrator</option></select>
+      <p id="auth-message" class="auth-message" aria-live="polite"></p>
+      <button class="auth-submit" type="submit">Sign in <span>→</span></button>
+    </form>
+    <button id="demo-login" class="auth-demo" type="button">Explore demo without an account</button>
+    <p class="auth-footnote">Hackathon demo only. Sign-in here is simulated unless you configure a live authentication provider. Do not enter real patient information.</p>
+  </div><div class="auth-side"><div class="auth-side-icon">✚</div><h2>Health records.<br>In your control.</h2><p>Explore patient-controlled record sharing, consent workflows, appointments, and access history in one secure-health demo.</p><div class="auth-feature"><span>✓</span> Consent-led sharing</div><div class="auth-feature"><span>✓</span> Transparent access history</div><div class="auth-feature"><span>✓</span> Fictional demo data</div></div>
+</section>
+<div id="app" hidden>
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#" data-view="overview"><span class="brand-mark"><svg viewBox="0 0 40 40"><path d="M16 6h8v10h10v8H24v10h-8V24H6v-8h10z" fill="currentColor"/></svg></span><span><b>Curex</b><small>SECURE HEALTH</small></span></a>
+    <div class="demo-banner"><span class="pulse"></span> DEMO ENVIRONMENT <small>Fictional data only</small></div>
+    <div class="profile-switch">
+      <div class="avatar" id="role-avatar">AM</div><div class="profile-text"><b id="role-name">Aarav Mehta</b><small id="role-label">Patient account</small></div>
+      <select id="role-switch" aria-label="Switch demo role"><option value="patient">Patient</option><option value="doctor">Doctor</option><option value="admin">Administrator</option></select>
+    </div>
+    <nav id="main-nav">
+      <p class="nav-label">YOUR HEALTH</p>
+      <button class="nav-item active" data-view="overview"><span>⌂</span> Overview</button>
+      <button class="nav-item" data-view="records"><span>▤</span> Medical records <i id="records-count">15</i></button>
+      <button class="nav-item" data-view="medications"><span>✚</span> Medications & allergies</button>
+      <button class="nav-item" data-view="appointments"><span>▦</span> Appointments</button>
+      <p class="nav-label">CONTROL & SHARE</p>
+      <button class="nav-item" data-view="sharing"><span>⌁</span> Consent & sharing <i id="requests-count">6</i></button>
+      <button class="nav-item" data-view="emergency"><span>♡</span> Emergency access</button>
+      <button class="nav-item" data-view="summaries"><span>✧</span> Health summaries</button>
+      <p class="nav-label">TRANSPARENCY</p>
+      <button class="nav-item" data-view="audit"><span>◷</span> Access history</button>
+      <button class="nav-item admin-only" data-view="admin"><span>⚙</span> Administration</button>
+    </nav>
+    <div class="sidebar-bottom"><div class="security-card"><span class="security-icon">♧</span><div><b>Your health, your choice.</b><small>Share only what you approve.</small></div></div><button class="nav-item" id="settings-btn"><span>⚙</span> Settings</button><button class="nav-item" id="logout-btn"><span>↪</span> Sign out of demo</button><div class="sidebar-foot"><span class="online-dot"></span> Demo mode · local device storage</div></div>
+  </aside>
+  <main class="main-area">
+    <header class="topbar"><button class="icon-button mobile-menu" id="menu-btn" aria-label="Open navigation">☰</button><div class="breadcrumb"><span>Workspace</span><b>/</b><strong id="crumb-current">Overview</strong></div><div class="top-actions"><span class="secure-pill"><span>●</span> Privacy-first workspace</span><button class="icon-button" id="notifications-btn" aria-label="Notifications">♧<em></em></button><button class="top-avatar" id="top-avatar">AM</button></div></header>
+    <div class="page-wrap"><div id="page-content"></div><footer class="page-footer"><span>© 2026 Curex Secure Health</span><span><span class="online-dot"></span> Demo environment · Not for clinical use</span></footer></div>
+  </main>
+</div>
+<dialog id="modal"><form method="dialog" class="modal-shell" id="modal-form"><button class="modal-close" value="cancel" aria-label="Close">×</button><div id="modal-content"></div></form></dialog>
+<script src="app.js"></script>
+</body></html>

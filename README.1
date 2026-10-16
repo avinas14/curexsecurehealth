@@ -1,0 +1,917 @@
+# Curex Secure Health 🏥
+### Secure, Consent-Based Digital Health Record Sharing
+
+Curex Secure Health is a healthcare web application designed to help patients manage their digital medical records and share them securely with authorized healthcare professionals. The platform aims to improve healthcare record accessibility while prioritizing patient consent, privacy, and accountability.
+
+> **Demo notice:** Any sample patients, prescriptions, appointments, medical reports, or other example records used in demonstrations must be fictional and clearly labeled **DEMO DATA — NOT REAL PATIENT INFORMATION**. This project is a prototype and must not be relied on for clinical decisions.
+
+---
+
+## Table of Contents
+
+1. [Project Overview](#1-project-overview)
+2. [Problem Statement](#2-problem-statement)
+3. [Objectives](#3-objectives)
+4. [Key Features](#4-key-features)
+5. [Technology Stack](#5-technology-stack)
+6. [Project Architecture](#6-project-architecture)
+7. [Prerequisites](#7-prerequisites)
+8. [Installation and Setup](#8-installation-and-setup)
+9. [Supabase Configuration](#9-supabase-configuration)
+10. [Database Persistence](#10-database-persistence)
+11. [Application Modules](#11-application-modules)
+12. [Medical Document Storage](#12-medical-document-storage)
+13. [Security and Privacy](#13-security-and-privacy)
+14. [Demo Data](#14-demo-data)
+15. [Testing and Verification](#15-testing-and-verification)
+16. [Running the Application](#16-running-the-application)
+17. [Deployment](#17-deployment)
+18. [Troubleshooting](#18-troubleshooting)
+19. [Limitations](#19-limitations)
+20. [Future Enhancements](#20-future-enhancements)
+21. [Contributing](#21-contributing)
+22. [License](#22-license)
+
+---
+
+## 1. Project Overview
+
+Curex Secure Health provides a centralized interface for managing digital healthcare records and supporting consent-based sharing between patients and authorized healthcare professionals.
+
+The application is designed around the following principles:
+
+- **Patient control:** Patients should be able to manage sharing permissions for their records.
+- **Secure access:** Users should only access information permitted by their identity, role, and authorization.
+- **Persistent records:** Changes made through the website should be saved in the Supabase database.
+- **Accountability:** Relevant access and sharing activities should be recorded in audit logs.
+- **Accessible design:** The interface should be responsive, understandable, and easy to navigate.
+- **Privacy by design:** Medical records should not be publicly accessible without authorization.
+
+## 2. Problem Statement
+
+Medical records are frequently distributed across different healthcare providers and disconnected systems. This can make it difficult for patients and authorized doctors to access relevant medical history when needed.
+
+Uncontrolled record sharing can also expose sensitive personal information.
+
+Curex Secure Health aims to address these challenges through digital medical record management, patient-controlled sharing permissions, protected document storage, and auditable access.
+
+## 3. Objectives
+
+- Provide secure registration and authentication.
+- Maintain patient profiles and healthcare-related information.
+- Store and organize digital medical records.
+- Support prescription, appointment, and medical history management.
+- Allow patients to grant and revoke record-sharing permissions.
+- Support time-limited QR-based sharing where implemented.
+- Restrict access according to authenticated identity and role.
+- Maintain access history and relevant security events.
+- Integrate Supabase for persistent data storage.
+- Provide a clean, responsive healthcare interface.
+
+## 4. Key Features
+
+### 4.1 Authentication and User Management
+
+- Patient, doctor, and administrator account workflows.
+- Login and logout.
+- Role-aware navigation.
+- Profile management.
+- Authentication through Supabase Auth where configured.
+- Session management.
+
+OTP, identity verification, biometrics, passkeys, and advanced rate limiting require the corresponding services and implementations. They must not be represented as active unless verified.
+
+### 4.2 Patient Profiles
+
+- Patient demographic information.
+- Profile viewing and editing.
+- Relevant healthcare information.
+- Role-appropriate access to personal records.
+
+### 4.3 Digital Medical Records
+
+- Medical record metadata.
+- Laboratory reports.
+- Prescriptions.
+- Consultation notes.
+- Medical history.
+- Treatment summaries.
+- Document upload and retrieval through protected storage.
+
+### 4.4 Prescription Management
+
+- Prescription details.
+- Prescribing professional information.
+- Prescription dates and status.
+- Authorized viewing and management.
+
+### 4.5 Appointment Management
+
+- Appointment scheduling.
+- Appointment details.
+- Appointment status.
+- Authorized updates and cancellations.
+
+### 4.6 Consent-Based Sharing
+
+- Record-sharing requests.
+- Patient consent management.
+- Permission status.
+- Consent revocation.
+- Expiry-aware sharing where implemented.
+
+### 4.7 QR-Based Record Sharing
+
+Where implemented, sharing should use a secure, unpredictable token associated with an authorized sharing session.
+
+Sharing sessions should support:
+
+- Expiration.
+- Revocation.
+- Restricted record scope.
+- Authorized access checks.
+- Single-use behavior when required.
+- Audit logging.
+
+A QR code is not itself a security control. The server must validate the token, permissions, expiry, and session status before granting access.
+
+### 4.8 Audit Logs
+
+Record relevant events, such as:
+
+- Record access.
+- Sharing requests.
+- Consent changes.
+- Document uploads.
+- Failed authorization attempts.
+- Administrative actions.
+
+Audit records should be protected against unauthorized modification.
+
+### 4.9 Notifications
+
+- Appointment notifications.
+- Sharing-request notifications.
+- Consent status notifications.
+- Relevant account activity notifications.
+
+Email, SMS, and real-time delivery require the relevant integrations.
+
+### 4.10 AI-Assisted Summaries and Safety Alerts
+
+If enabled, AI-assisted features may help summarize medical history or flag potential medication concerns.
+
+- Display appropriate safety disclaimers.
+- Preserve links to the source records.
+- Protect sensitive information sent to external services.
+- Do not present AI output as a confirmed diagnosis.
+- Require qualified clinical review for medical decisions.
+
+These features must be described as prototypes unless the integrations, validations, and test cases have been implemented and verified.
+
+---
+
+## 5. Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| HTML | Application structure |
+| CSS | Styling and responsive layouts |
+| JavaScript | UI interactions and application logic |
+| Supabase Auth | Authentication and sessions |
+| Supabase PostgreSQL | Persistent relational data |
+| Supabase Storage | Protected medical document storage |
+| Supabase Row Level Security (RLS) | Database access policies |
+| Supabase Edge Functions | Optional trusted server-side operations |
+| Git and GitHub | Source control |
+| Static hosting or supported web hosting | Application deployment |
+
+The exact dependencies and development commands depend on the existing project's files. Check `package.json` before running npm commands.
+
+## 6. Project Architecture
+
+```text
+Patient / Doctor / Administrator
+                |
+                v
+       Curex Web Application
+         HTML / CSS / JS
+                |
+                v
+       Supabase Client Library
+                |
+                v
+       Supabase Authentication
+                |
+                v
+      PostgreSQL + RLS Policies
+                |
+                +------> Protected Storage
+                |
+                +------> Edge Functions
+                |
+                +------> Audit and Notifications
+```
+
+The browser may use a Supabase publishable key, but database policies must enforce access permissions. Privileged operations and secret keys must remain on trusted server-side infrastructure.
+
+## 7. Prerequisites
+
+Before setting up the application, install or prepare:
+
+- Visual Studio Code.
+- A supported modern browser.
+- Git, if using version control.
+- Node.js and npm if the project uses a Node-based development server or build tool.
+- Access to the existing Supabase project.
+- The application source code.
+
+You do not need to recreate existing database tables simply to connect the website to them.
+
+## 8. Installation and Setup
+
+### Step 1: Extract the project
+
+Extract the Curex project ZIP into a folder, for example:
+
+```text
+Curex-Secure-Health/
+```
+
+Open that folder in Visual Studio Code.
+
+### Step 2: Identify the project type
+
+Look for the following files:
+
+- `index.html`
+- `package.json`
+- `supabase.js`, `config.js`, or similar configuration files.
+- JavaScript files containing database operations.
+- SQL schema or seed files, if present.
+
+If `package.json` exists, open it and inspect the available scripts before running commands.
+
+### Step 3: Install dependencies
+
+For a Node-based project, open the VS Code terminal in the folder containing `package.json` and run:
+
+```bash
+npm install
+```
+
+If the project does not contain `package.json`, do not run npm commands blindly. Follow the setup instructions appropriate to its actual structure.
+
+### Step 4: Start the development server
+
+For a project that defines a `dev` script:
+
+```bash
+npm run dev
+```
+
+Open the local URL printed in the terminal.
+
+For a plain HTML/CSS/JavaScript application, use a local development server such as the VS Code Live Server extension, if appropriate.
+
+**Important:** Open the correct project root. Do not append an unnecessary slash after a file URL such as `/index.html/`. A `Cannot GET /index.html/` message can indicate an incorrect route or server configuration.
+
+---
+
+## 9. Supabase Configuration
+
+### Step 1: Open your existing project
+
+Visit the [Supabase Dashboard](https://supabase.com/dashboard) and select the Supabase project already connected to Curex.
+
+### Step 2: Obtain the client configuration
+
+From the project's API or Connect settings, obtain:
+
+- Project URL.
+- Publishable API key, or the legacy `anon` key if that is what the project uses.
+
+Use the existing project values rather than creating another Supabase project unnecessarily.
+
+### Step 3: Configure the Supabase client
+
+For a plain HTML and JavaScript application using the Supabase JavaScript CDN, the pattern is:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+  const SUPABASE_PUBLISHABLE_KEY = "YOUR_PUBLISHABLE_KEY";
+
+  const supabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+</script>
+```
+
+Replace the placeholders with your actual configuration.
+
+If your application already initializes a client, reuse it. Avoid creating multiple clients with conflicting configuration.
+
+For a project using npm imports, follow its existing module structure instead of adding the CDN script.
+
+### Step 4: Verify the connection
+
+After initialization, test a read operation against an existing table:
+
+```javascript
+async function testSupabaseConnection() {
+  const { data, error } = await supabase
+    .from("YOUR_EXISTING_TABLE")
+    .select("*")
+    .limit(1);
+
+  if (error) {
+    console.error("Supabase connection/query failed:", error.message);
+    return false;
+  }
+
+  console.log("Supabase query succeeded:", data);
+  return true;
+}
+```
+
+Replace `YOUR_EXISTING_TABLE` with a table that exists in your database and that the signed-in user is authorized to read.
+
+A successful query verifies that the client can access that table. It does not prove that all modules or write operations are configured correctly.
+
+---
+
+## 10. Database Persistence
+
+**Every website edit that should survive a refresh must be written to the database or Storage.** Updating only the visible HTML, JavaScript variables, or temporary component state is not sufficient.
+
+### 10.1 Read records
+
+```javascript
+async function getPatientRecords(patientId) {
+  const { data, error } = await supabase
+    .from("YOUR_MEDICAL_RECORDS_TABLE")
+    .select("*")
+    .eq("patient_id", patientId);
+
+  if (error) {
+    console.error("Could not load records:", error.message);
+    return null;
+  }
+
+  return data;
+}
+```
+
+Use the actual table and column names from your existing schema.
+
+### 10.2 Insert a new record
+
+```javascript
+async function createRecord(record) {
+  const { data, error } = await supabase
+    .from("YOUR_EXISTING_TABLE")
+    .insert(record)
+    .select();
+
+  if (error) {
+    console.error("Could not save record:", error.message);
+    return null;
+  }
+
+  return data;
+}
+```
+
+### 10.3 Update an existing record
+
+```javascript
+async function updateRecord(recordId, updates) {
+  const { data, error } = await supabase
+    .from("YOUR_EXISTING_TABLE")
+    .update(updates)
+    .eq("id", recordId)
+    .select();
+
+  if (error) {
+    console.error("Update failed:", error.message);
+    return null;
+  }
+
+  if (!data || data.length === 0) {
+    console.warn("No record was updated.");
+    return null;
+  }
+
+  return data[0];
+}
+```
+
+The record ID must be the real identifier of the row being edited. The database's RLS policies must authorize the operation.
+
+### 10.4 Delete a record
+
+```javascript
+async function deleteRecord(recordId) {
+  const { data, error } = await supabase
+    .from("YOUR_EXISTING_TABLE")
+    .delete()
+    .eq("id", recordId)
+    .select();
+
+  if (error) {
+    console.error("Delete failed:", error.message);
+    return false;
+  }
+
+  return Array.isArray(data) && data.length > 0;
+}
+```
+
+Deletion should only be implemented where appropriate. Medical records may need retention rules or a documented correction process instead of ordinary deletion.
+
+### 10.5 Connect a form to a database update
+
+Example pattern for an existing patient edit form:
+
+```javascript
+const patientForm = document.querySelector("#patientForm");
+
+patientForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const patientId = patientForm.dataset.patientId;
+
+  if (!patientId) {
+    alert("Patient ID is missing.");
+    return;
+  }
+
+  const formData = new FormData(patientForm);
+
+  const updates = {
+    full_name: String(formData.get("full_name") || "").trim()
+  };
+
+  const savedPatient = await updateRecord(
+    patientId,
+    updates
+  );
+
+  if (savedPatient) {
+    alert("Changes saved successfully.");
+    // Reload the relevant patient information here.
+  } else {
+    alert("Unable to save changes. Check permissions and logs.");
+  }
+});
+```
+
+This is an illustrative pattern. Match the form selector, table, field names, and primary key to the actual application.
+
+### 10.6 Refresh the interface after saving
+
+After a successful insert or update:
+
+1. Use the returned database record where appropriate.
+2. Refresh the relevant table or profile view.
+3. Show a success message only after the operation succeeds.
+4. Show a useful error message if the operation fails.
+5. Avoid reporting success when the database request was rejected.
+
+### 10.7 RLS policies
+
+Row Level Security must be enabled and correctly configured for tables containing patient information.
+
+Policies should define which authenticated users may:
+
+- Read a particular record.
+- Insert a record for an authorized patient.
+- Update a record they are allowed to manage.
+- Delete a record, where deletion is permitted.
+
+Do not use an unrestricted public policy as a shortcut. Avoid disabling RLS to make a failing update work.
+
+### 10.8 Persistence verification
+
+To verify a change:
+
+1. Sign in to the Curex website.
+2. Edit an authorized demo record.
+3. Click Save.
+4. Wait for the database request to finish.
+5. Refresh the page.
+6. Confirm the edited value is still displayed.
+7. Open Supabase Table Editor and verify the stored row, if your account has permission to view it.
+
+If the change disappears after refreshing, check whether the form actually sends a database request and whether the page reloads its data from Supabase.
+
+---
+
+## 11. Application Modules
+
+The application may contain the following modules, depending on the features implemented in the source code.
+
+| Module | Expected responsibility |
+|---|---|
+| Authentication | Register, sign in, sign out, and manage sessions |
+| User Profiles | Maintain role-appropriate profile information |
+| Medical Records | Manage record metadata and authorized retrieval |
+| Document Storage | Store files in protected Supabase Storage buckets |
+| Prescriptions | Maintain prescription information |
+| Appointments | Manage appointment records and statuses |
+| Consent Management | Record and enforce sharing permissions |
+| QR Sharing | Manage expiring and revocable sharing sessions |
+| Doctor Portal | Present records that the doctor is authorized to access |
+| Emergency Access | Implement a controlled and auditable emergency workflow |
+| AI Assistance | Provide clearly labeled, reviewed AI-assisted summaries if implemented |
+| Safety Alerts | Support validated alerts where implemented |
+| Audit Logs | Track relevant access and security events |
+| Notifications | Show or deliver relevant updates |
+| Administration | Provide authorized administrative management |
+
+The table describes intended responsibilities, not confirmation that every feature is fully implemented.
+
+---
+
+## 12. Medical Document Storage
+
+Medical documents should be stored in Supabase Storage rather than placed directly into ordinary text columns in PostgreSQL.
+
+Recommended workflow:
+
+1. Authenticate the user.
+2. Validate the file type and size.
+3. Generate a controlled storage path.
+4. Upload the file to a private bucket.
+5. Store metadata and the storage path in the appropriate database table.
+6. Enforce access policies for both the metadata and the file.
+7. Provide access through a short-lived signed URL or an authorized server-side download flow.
+
+Example upload pattern:
+
+```javascript
+async function uploadMedicalDocument(file, storagePath) {
+  const allowedTypes = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png"
+  ];
+
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error("Unsupported file type.");
+  }
+
+  const { data, error } = await supabase.storage
+    .from("YOUR_PRIVATE_BUCKET")
+    .upload(storagePath, file, {
+      upsert: false
+    });
+
+  if (error) {
+    console.error("Document upload failed:", error.message);
+    throw error;
+  }
+
+  return data;
+}
+```
+
+Replace the bucket name and storage path with the actual values. Add a reasonable size limit and verify content on a trusted server where required. File extension and browser MIME checks alone do not guarantee that a file is safe.
+
+Do not use public buckets for private medical reports.
+
+---
+
+## 13. Security and Privacy
+
+### Authentication
+
+- Use Supabase Auth or another properly configured authentication system.
+- Validate the authenticated identity before protected operations.
+- Protect sessions and sign-out workflows.
+- Avoid relying solely on a role value supplied by the browser.
+
+### Authorization
+
+- Enable RLS on sensitive database tables.
+- Enforce patient, doctor, and administrator permissions in database policies and trusted server-side operations.
+- Verify record ownership and consent before sharing information.
+- Do not assume that hiding a button in the UI protects the underlying data.
+
+### API keys
+
+- A Supabase publishable key is intended for client-side use with appropriate RLS policies.
+- Never expose a service-role key or other secret in frontend code, public repositories, or client-side environment variables.
+- Use trusted server-side functions for privileged operations.
+
+### Medical documents
+
+- Keep storage buckets private.
+- Validate access before issuing signed URLs.
+- Use short expiry periods appropriate to the operation.
+- Avoid exposing storage paths or document links unnecessarily.
+
+### Auditability
+
+- Log relevant record-access and permission changes.
+- Protect audit logs from unauthorized edits.
+- Do not log passwords, OTPs, access tokens, or unnecessary medical details.
+
+### Patient consent
+
+- Record the scope and status of consent.
+- Enforce consent when accessing shared records.
+- Support revocation where required.
+- Expire sharing sessions when their validity ends.
+
+### Demo data
+
+- Use only fictional patient information.
+- Clearly label demo records.
+- Never upload real medical records into a public demonstration without appropriate authorization and safeguards.
+
+---
+
+## 14. Demo Data
+
+For demonstrations, the project may include fictional records for:
+
+- Patients.
+- Doctors.
+- Healthcare organizations.
+- Medical records.
+- Prescriptions.
+- Appointments.
+- Consent and sharing requests.
+- QR-sharing sessions.
+- Audit events.
+- Emergency-access requests.
+- Notifications.
+- AI summaries and safety test cases.
+
+Every demo record must be visibly marked:
+
+**DEMO DATA — NOT REAL PATIENT INFORMATION**
+
+### Seed data
+
+If the project includes `supabase/seed.sql`, review it before execution.
+
+A safe seed workflow should:
+
+- Match the existing schema and foreign-key relationships.
+- Use fictional values and reserved example email addresses.
+- Avoid modifying or deleting unrelated production data.
+- Be repeatable where safe.
+- Avoid inserting directly into Supabase-managed authentication tables as a shortcut.
+- Use supported authentication setup for demo accounts.
+- Never bypass RLS as a general application security solution.
+
+Run seed SQL only after confirming the target database and understanding its effects.
+
+---
+
+## 15. Testing and Verification
+
+### Functional tests
+
+- Register and sign in with an authorized demo account.
+- Load the correct profile.
+- Update a profile and refresh the page.
+- Add a medical-record entry.
+- Upload and retrieve a sample report.
+- Create and update a prescription.
+- Create and update an appointment.
+- Submit and revoke a sharing permission.
+- Verify audit events.
+- Confirm that notifications reflect saved changes where implemented.
+
+### Security tests
+
+- Confirm that signed-out users cannot access protected records.
+- Confirm that one patient cannot access another patient's private records.
+- Confirm that a doctor cannot access records outside their authorization.
+- Confirm that revoked sharing access no longer works.
+- Confirm that expired QR sessions are rejected.
+- Confirm that private files cannot be downloaded without authorization.
+- Confirm that unauthorized database writes fail.
+
+### Persistence tests
+
+For every module that supports editing:
+
+1. Make a change through the UI.
+2. Confirm the request succeeds.
+3. Refresh the browser.
+4. Confirm the value remains.
+5. Check the database row if authorized.
+6. Repeat using a user who should not have permission.
+
+### Error handling
+
+Test invalid form data, duplicate submissions, network failures, expired sessions, and database permission errors.
+
+A feature should only be marked complete after its expected behavior has been tested.
+
+---
+
+## 16. Running the Application
+
+The exact commands depend on the project's configuration.
+
+For a Node-based application with a configured `dev` script:
+
+```bash
+npm install
+npm run dev
+```
+
+For a project with a configured `start` script, use the corresponding command documented in `package.json`.
+
+For a plain HTML application, serve the project root through a local development server. Do not assume that every project requires a build step.
+
+### Suggested development workflow
+
+1. Open the project in VS Code.
+2. Review the source files and dependencies.
+3. Verify Supabase URL and publishable key configuration.
+4. Confirm that existing database tables and RLS policies are correct.
+5. Start the local server.
+6. Sign in with a configured demo account.
+7. Test database reads and writes.
+8. Review browser and terminal errors.
+9. Test access control before demonstrating the application.
+
+---
+
+## 17. Deployment
+
+The frontend can be deployed to a static hosting platform or another host compatible with the project's technology stack.
+
+### Deployment checklist
+
+- [ ] The application runs locally.
+- [ ] Required dependencies install successfully.
+- [ ] Supabase URL and publishable key are configured.
+- [ ] No service-role keys or secrets are included in frontend files.
+- [ ] Database RLS policies are reviewed.
+- [ ] Storage buckets are private where required.
+- [ ] Authentication redirect URLs are configured for the deployed domain.
+- [ ] The production build command and output directory are verified, if applicable.
+- [ ] Demo data is clearly labeled.
+- [ ] Protected routes and database operations are tested after deployment.
+- [ ] Error handling works in the deployed environment.
+- [ ] Sensitive information is not included in logs or public source control.
+
+### Environment variables
+
+If the project uses a build tool, configure its supported public environment variables according to the tool's conventions. Variables exposed to frontend code are not secrets.
+
+Keep privileged API keys and service credentials in the hosting platform's server-side secret configuration.
+
+---
+
+## 18. Troubleshooting
+
+### Changes disappear after refreshing
+
+**Possible causes:**
+
+- The UI only updates local JavaScript state.
+- The Save button does not call Supabase.
+- The database operation fails.
+- The page loads sample data instead of querying Supabase.
+- The updated row does not match the supplied ID.
+- RLS blocks the operation.
+
+**Checks:**
+
+- Inspect the browser console.
+- Inspect the browser Network panel.
+- Read the returned Supabase error.
+- Verify the correct table and columns.
+- Check RLS policies.
+- Refresh the data after a successful save.
+
+### `Cannot GET /index.html/`
+
+**Possible causes:**
+
+- Incorrect route.
+- Incorrect server root.
+- A trailing slash was appended to a file path.
+- The selected server does not serve the project as expected.
+
+**Checks:**
+
+- Open the local root URL shown by the server.
+- Try `/index.html` without the trailing slash if the server supports it.
+- Confirm that `index.html` exists in the expected directory.
+- Use the appropriate development server for the project.
+
+### Supabase permission error
+
+**Possible causes:**
+
+- Missing or incorrect RLS policy.
+- No valid authenticated session.
+- The user does not own the record.
+- A doctor or administrator lacks the required authorization.
+- The operation uses incorrect column names or data types.
+
+Do not resolve these errors by making sensitive tables publicly writable.
+
+### Table or column not found
+
+- Open Supabase Table Editor.
+- Confirm the exact schema, table, and column names.
+- Compare them with the application queries.
+- Update the application code to match the existing schema rather than creating duplicate tables unnecessarily.
+
+### File upload fails
+
+- Confirm the Storage bucket exists.
+- Verify that the bucket is private where required.
+- Check upload policies, accepted file types, and size limits.
+- Confirm the user's session and storage path.
+- Review the returned Storage error.
+
+### Authentication works but records do not load
+
+- Check the current authenticated user.
+- Verify the table's SELECT policy.
+- Confirm the query filters match the schema.
+- Ensure the page does not rely on hardcoded demo arrays.
+
+---
+
+## 19. Limitations
+
+Curex Secure Health is a prototype unless its security, integrations, and operational readiness have been independently verified.
+
+Potential limitations include:
+
+- External hospital integration may not be available.
+- OTP and identity verification may require third-party services.
+- Biometric and passkey support requires additional implementation.
+- QR sharing must be validated against real authorization and expiry rules.
+- AI summaries may be incomplete or incorrect.
+- Medication safety alerts require reliable reference data and clinical validation.
+- Deployment alone does not establish regulatory compliance.
+- Security, privacy, and clinical suitability require appropriate review before real-world use.
+
+Do not describe simulated integrations as live integrations.
+
+---
+
+## 20. Future Enhancements
+
+- Standardized healthcare data exchange.
+- Stronger identity verification.
+- Passkeys and multi-factor authentication.
+- More comprehensive consent workflows.
+- Secure, revocable QR-sharing sessions.
+- Improved access anomaly detection.
+- Clinically reviewed medication safety rules.
+- Accessible multilingual interface.
+- Automated security and regression tests.
+- Monitoring, backups, and incident-response procedures.
+- Independent privacy and security assessment.
+
+---
+
+## 21. Contributing
+
+Contributions should preserve patient privacy and application security.
+
+1. Create a feature branch.
+2. Make changes in a dedicated area.
+3. Test the relevant module.
+4. Verify database persistence.
+5. Test authorization and error handling.
+6. Avoid committing secrets or real patient information.
+7. Submit changes for review.
+
+Do not include real patient records in test fixtures, screenshots, or example datasets.
+
+---
+
+## 22. License
+
+Add the project's chosen license before redistributing the source code. Until a license is selected, do not assume that the project is open source or that unrestricted reuse is permitted.
+
+---
+
+## Project Status
+
+**Project:** Curex Secure Health  
+**Category:** Healthcare technology / secure medical record sharing  
+**Primary backend:** Supabase  
+**Primary goal:** Persistent, privacy-aware, consent-based healthcare record management  
+**Data policy:** Demo data must be fictional and labeled clearly
+
+**Final verification rule:** A module is considered connected to Supabase only when its data is loaded from the database, authorized changes are written successfully, and the changes remain visible after refreshing the application.
